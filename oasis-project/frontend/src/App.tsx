@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import HomePage from './pages/Home.tsx'
+import HomePage from './pages/Home.tsx';
+import StreetViewApp from './pages/Game.tsx';
 import './App.css'
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />}/>
+        <Route path="/game" element={<StreetViewApp/>}/>
       </Routes>
     </BrowserRouter>
     </>
