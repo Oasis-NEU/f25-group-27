@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, Map, X } from 'lucide-react';
 
-
 interface Location {
   lat: number;
   lng: number;
@@ -23,7 +22,7 @@ export default function StreetViewApp() {
   const streetViewRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
 
   useEffect(() => {
     // Check if Google Maps is already loaded
@@ -52,7 +51,7 @@ export default function StreetViewApp() {
     // Load Google Maps API
     console.log('Loading Google Maps API...');
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=marker, geometry`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
@@ -89,11 +88,13 @@ export default function StreetViewApp() {
     if (showMap && mapRef.current && window.google && !mapInstanceRef.current) {
       // Initialize the map
       mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        mapId: "Guessing-Map",
         center: INITIAL_LOCATION,
         zoom: 15,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        clickableIcons: false,
       });
 
       // Add click listener to place or move marker
@@ -108,14 +109,14 @@ export default function StreetViewApp() {
 
           //If marker doesn't exist, create it. Otherwise, move it.
           if (!markerRef.current && mapInstanceRef.current) {
-          markerRef.current = new window.google.maps.Marker({
+          markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
             position: clickedLocation,
             map: mapInstanceRef.current,
             title: 'Current Guess',
-            draggable: false,
+            gmpDraggable: false,
           });
         } else if (markerRef.current) {
-          markerRef.current.setPosition(clickedLocation);
+          markerRef.current.position = clickedLocation;
         }
         }
       });
@@ -163,8 +164,8 @@ export default function StreetViewApp() {
           onClick={() => {
             if (markerRef.current) {
               const guessedPosition = {
-                lat: markerRef.current.getPosition()!.lat(),
-                lng: markerRef.current.getPosition()!.lng(),
+                lat: markerRef.current.position,
+                lng: markerRef.current.position,
               }
               console.log('Confirmed Guess at:', guessedPosition);
 
@@ -172,12 +173,16 @@ export default function StreetViewApp() {
                 new google.maps.LatLng(guessedPosition.lat, guessedPosition.lng),
                 new google.maps.LatLng(INITIAL_LOCATION.lat, INITIAL_LOCATION.lng)
               );
-              console.log('Distance from actual location:', difference);
+              console.log('Distance from actual location:', difference, "meters.");
 
-              if (difference < 125) {
+              const score = Math.trunc(((1487 - difference) / 1487) * 1000);
+
+              if (score > 920) {
                 console.log('Great job! You are very close!');
+                console.log('Score: ', score);
               } else {
-                console.log('You lose! Final distance:', difference);
+                console.log('Too far! Better luck next time.');
+                console.log('Score: ', score);
               }
           };
         }}
