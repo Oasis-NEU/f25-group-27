@@ -10,7 +10,8 @@ interface Location {
 export default function StreetViewApp() {
 
   // CONFIGURE YOUR LOCATION HERE
-  const INITIAL_LOCATION: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
+  const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
+  const INITIAL_LOCATION: Location = { lat: 42.3370736, lng: -71.0936173 }; //West Corner of Campus
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
@@ -175,9 +176,9 @@ export default function StreetViewApp() {
               );
               console.log('Distance from actual location:', difference, "meters.");
 
-              const score = Math.trunc(((1487 - difference) / 1487) * 1000);
+              const score = Math.min(1000, Math.max(0, (1000 * Math.exp(-3 * difference/1000) + 50)));
 
-              if (score > 920) {
+              if (score > 850) {
                 console.log('Great job! You are very close!');
                 console.log('Score: ', score);
               } else {
