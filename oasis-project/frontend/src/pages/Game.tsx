@@ -22,6 +22,11 @@ export default function StreetViewApp() {
   const CHRISTIAN_SCIENCE: Location = { lat: 42.34481566080893, lng: -71.08394962188773 } // Approximate Center of Campus
   const CAMPUS_CENTER: Location = { lat: 42.339015298689084, lng: -71.08872168679216 } // Approximate Center of Campus
   const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
+  const FENWAY_PATH: Location = { lat: 42.3409852, lng: -71.0914785 }; // Along the path to fenway north of Stwest
+  const RUGGLES_STATION: Location = { lat: 42.3361246, lng: 71.0887778 }; // Ruggles T Station
+  const WAR_MEMORIAL: Location = { lat: 42.3377552, lng: -71.089432 }; // War Memorial 
+  const CENTENIAL: Location = { lat: 42.3370999, lng: -71.0905084 }; //Centennial Common
+  const ISEC_INSIDE: Location = { lat: 42.3375038, lng: -71.086988 }; // Inside ISEC Building
   const INITIAL_LOCATION: Location = { lat: 42.3370736, lng: -71.0936173 }; //West Corner of Campus
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
@@ -82,6 +87,7 @@ export default function StreetViewApp() {
             motionTrackingControl: true,
             clickToGo: false,
             linksControl: false,
+            showRoadLabels: false,
           }
         );
       }
@@ -113,7 +119,7 @@ export default function StreetViewApp() {
             motionTrackingControl: true,
             linksControl: false,
             clickToGo: false,
-
+            showRoadLabels: false,
           }
         );
       }
