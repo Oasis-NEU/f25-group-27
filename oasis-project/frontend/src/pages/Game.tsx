@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, Map, X } from 'lucide-react';
 
-
 interface Location {
   lat: number;
   lng: number;
@@ -11,7 +10,9 @@ interface Location {
 export default function StreetViewApp() {
 
   // CONFIGURE YOUR LOCATION HERE
-  const INITIAL_LOCATION: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
+  const CAMPUS_CENTER: Location = { lat: 42.339015298689084, lng: -71.08872168679216 } // Approximate Center of Campus
+  const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
+  const INITIAL_LOCATION: Location = { lat: 42.3370736, lng: -71.0936173 }; //West Corner of Campus
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
@@ -19,11 +20,17 @@ export default function StreetViewApp() {
   // Replace with your actual API key
   const API_KEY: string = 'AIzaSyCo-qJ6-o4jR5EX-zocrl5B8yegOxmWRSI';
 
+  const [showResults, setShowResults] = useState<boolean>(false);
   const [showMap, setShowMap] = useState<boolean>(false);
+  const [score, setScore] = useState<number>(0);
+  const [distance, setDistance] = useState<number | null>(null);
   const streetViewRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  const lineRef = useRef<google.maps.Polyline | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const actualLocationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const hasGuessedRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Check if Google Maps is already loaded
@@ -52,7 +59,7 @@ export default function StreetViewApp() {
     // Load Google Maps API
     console.log('Loading Google Maps API...');
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=marker,geometry`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
@@ -89,15 +96,20 @@ export default function StreetViewApp() {
     if (showMap && mapRef.current && window.google && !mapInstanceRef.current) {
       // Initialize the map
       mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center: INITIAL_LOCATION,
-        zoom: 15,
+        mapId: "Guessing-Map",
+        center: CAMPUS_CENTER,
+        zoom: 16,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        clickableIcons: false,
       });
 
       // Add click listener to place or move marker
       mapInstanceRef.current.addListener('click', (e: google.maps.MapMouseEvent) => {
+        // Stop from placing marker if player has guessed already.
+        if (hasGuessedRef.current) return;
+
         if (e.latLng) {
           const clickedLocation = {
             lat: e.latLng.lat(),
@@ -108,19 +120,23 @@ export default function StreetViewApp() {
 
           //If marker doesn't exist, create it. Otherwise, move it.
           if (!markerRef.current && mapInstanceRef.current) {
-          markerRef.current = new window.google.maps.Marker({
+          markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
             position: clickedLocation,
             map: mapInstanceRef.current,
             title: 'Current Guess',
-            draggable: false,
+            gmpDraggable: false,
           });
         } else if (markerRef.current) {
-          markerRef.current.setPosition(clickedLocation);
+          markerRef.current.position = clickedLocation;
         }
         }
       });
     }
-  }, [showMap]);
+  }, [showMap, CAMPUS_CENTER]);
+
+  useEffect(() => {
+
+  })
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
@@ -159,25 +175,67 @@ export default function StreetViewApp() {
         </button>
 
         {/* Confirm Guess Button - Fixed at bottom center */}
+        { !hasGuessedRef.current && (
         <button
           onClick={() => {
-            if (markerRef.current) {
+
+            // Set guessed location to the current marker position
+            if (markerRef.current && markerRef.current.position) {
+              const position = markerRef.current.position as google.maps.LatLng;
               const guessedPosition = {
-                lat: markerRef.current.getPosition()!.lat(),
-                lng: markerRef.current.getPosition()!.lng(),
-              }
+                lat: position.lat,
+                lng: position.lng,
+              };
+
               console.log('Confirmed Guess at:', guessedPosition);
 
+              // Calculate distance from actual location
               const difference = google.maps.geometry.spherical.computeDistanceBetween(
                 new google.maps.LatLng(guessedPosition.lat, guessedPosition.lng),
                 new google.maps.LatLng(INITIAL_LOCATION.lat, INITIAL_LOCATION.lng)
               );
-              console.log('Distance from actual location:', difference);
+              console.log('Distance from actual location:', difference, "meters.");
 
-              if (difference < 125) {
+              // Calculate score based on distance
+              const calculatedScore = Math.round(Math.min(1000, Math.max(0, (1000 * Math.exp(-3 * difference/1000) + 50))));
+
+              setScore(calculatedScore);
+              setDistance(difference);
+
+              // Draw line between guessed location and actual location
+              if (mapInstanceRef.current) {
+                lineRef.current = new google.maps.Polyline({
+                  path: [
+                    { lat: guessedPosition.lat, lng: guessedPosition.lng },
+                    { lat: INITIAL_LOCATION.lat, lng: INITIAL_LOCATION.lng }
+                  ],
+                  geodesic: true,
+                  strokeColor: '#ff0000',
+                  strokeOpacity: 1.0,
+                  strokeWeight: 3,
+                  map: mapInstanceRef.current,
+                });
+
+                // Add marker on the actual location
+                actualLocationMarkerRef.current = new google.maps.marker.AdvancedMarkerElement({
+                  position: INITIAL_LOCATION,
+                  map: mapInstanceRef.current,
+                  title: 'Actual Location',
+                  gmpDraggable: false,
+                });
+              }
+
+              // Make Results Panel Appear
+              setShowResults(true);
+              hasGuessedRef.current = true;
+
+              
+              if (score > 850) {
                 console.log('Great job! You are very close!');
+                console.log('Score: ', score);
               } else {
-                console.log('You lose! Final distance:', difference);
+                console.log('Too far! Better luck next time.');
+                console.log('Score: ', score);
               }
           };
         }}
@@ -186,6 +244,7 @@ export default function StreetViewApp() {
             <Check size={20} />
             Confirm Guess
           </button>
+        )}
 
         {/* Map Container */}
         <div 
@@ -193,6 +252,54 @@ export default function StreetViewApp() {
           className="w-full h-full"
         />
       </div>
+
+      {/* Results Panel */}
+      { showResults && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-2xl p-8 z-50 max-w-md w-full">
+               {/* Close Button */}
+          <button
+            onClick={() => {
+              setShowResults(false);
+              }}
+            className="absolute top-4 right-4 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Results Content */}
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4 text-gray-800">Results</h2>
+            
+            <div className="mb-6">
+              <div className="text-6xl font-bold text-blue-600 mb-2">{score}</div>
+              <div className="text-gray-600">Points</div>
+            </div>
+
+            <div className="mb-6">
+              <div className="text-2xl font-semibold text-gray-700 mb-1">
+                {distance !== null ? distance.toFixed(1) : 0} meters
+              </div>
+              <div className="text-gray-500">Distance from actual location</div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              {score > 850 ? (
+                <p className="text-green-600 font-semibold text-lg">
+                  🎉 Great job! You're very close!
+                </p>
+              ) : score > 500 ? (
+                <p className="text-yellow-600 font-semibold text-lg">
+                  👍 Not bad! Getting warmer!
+                </p>
+              ) : (
+                <p className="text-red-600 font-semibold text-lg">
+                  📍 Too far! Better luck next time!
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
