@@ -31,13 +31,14 @@ export default function StreetViewApp() {
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const actualLocationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const hasGuessedRef = useRef<boolean>(false);
+  const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
   useEffect(() => {
     // Check if Google Maps is already loaded
     if (window.google && window.google.maps) {
       console.log('Google Maps already loaded');
       if (streetViewRef.current) {
-        new window.google.maps.StreetViewPanorama(
+        panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
             position: INITIAL_LOCATION,
@@ -50,6 +51,8 @@ export default function StreetViewApp() {
             fullscreenControl: true,
             motionTracking: true,
             motionTrackingControl: true,
+            clickToGo: false,
+            linksControl: false,
           }
         );
       }
@@ -66,7 +69,7 @@ export default function StreetViewApp() {
       console.log('Google Maps API loaded successfully');
       // Initialize Street View panorama
       if (streetViewRef.current) {
-        new window.google.maps.StreetViewPanorama(
+        panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
             position: INITIAL_LOCATION,
@@ -133,10 +136,6 @@ export default function StreetViewApp() {
       });
     }
   }, [showMap, CAMPUS_CENTER]);
-
-  useEffect(() => {
-
-  })
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
