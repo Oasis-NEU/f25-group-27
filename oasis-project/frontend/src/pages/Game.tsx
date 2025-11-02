@@ -253,6 +253,7 @@ export default function StreetViewApp() {
                   strokeColor: '#ff0000',
                   strokeOpacity: 1.0,
                   strokeWeight: 3,
+                  visible: true,
                   map: mapInstanceRef.current,
                 });
 
@@ -305,6 +306,11 @@ export default function StreetViewApp() {
               panoRef.current?.setPosition(newpos);
               hasGuessedRef.current = false;
               setShowMap(false);
+              lineRef.current?.setVisible(false);
+              if (markerRef.current && actualLocationMarkerRef.current) {
+                markerRef.current.map = null;
+                actualLocationMarkerRef.current.map = null;
+              }
               }
             }
             
