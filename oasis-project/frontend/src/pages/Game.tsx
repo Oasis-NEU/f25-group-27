@@ -51,7 +51,8 @@ export default function StreetViewApp() {
 
   function chooseLoc(lastLoc: Location | null = null){
     let possible_locations = new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
-                              SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD])
+                              SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
+                              FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE,])
 
     if (lastLoc){
       possible_locations.delete(lastLoc)
