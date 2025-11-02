@@ -9,7 +9,17 @@ interface Location {
 
 export default function StreetViewApp() {
 
-  // CONFIGURE YOUR LOCATION HERE
+  // LOCATIONS
+  const MARINO: Location = { lat: 42.3398567, lng: -71.0907273 } // Approximate Center of Campus
+  const CABOT: Location = { lat: 42.3397469, lng: -71.089287 } // Approximate Center of Campus
+  const MUGAR: Location = { lat: 42.3394737, lng: -71.086873 } // Approximate Center of Campus
+  const EV: Location = { lat: 42.3402671, lng: -71.0868493 } // Approximate Center of Campus
+  const STEAST: Location = { lat: 42.3409249, lng: -71.0898761 } // Approximate Center of Campus
+  const CATHOLIC_CENTER: Location = { lat: 42.3417765, lng: -71.0876946 } // Approximate Center of Campus
+  const MASS300: Location = { lat: 42.34344746989925, lng: -71.08563281045348 } // Approximate Center of Campus
+  const SHERATON: Location = { lat: 42.34591594539982, lng: -71.0835674735219 } // Approximate Center of Campus
+  const MIDTOWN: Location = { lat: 42.34405670960164, lng: -71.08353192101417 } // Approximate Center of Campus
+  const CHRISTIAN_SCIENCE: Location = { lat: 42.34481566080893, lng: -71.08394962188773 } // Approximate Center of Campus
   const CAMPUS_CENTER: Location = { lat: 42.339015298689084, lng: -71.08872168679216 } // Approximate Center of Campus
   const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
   const FENWAY_PATH: Location = { lat: 42.3409852, lng: -71.0914785 }; // Along the path to fenway north of Stwest
@@ -25,6 +35,7 @@ export default function StreetViewApp() {
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
+  const CURRENT_LOCATION = useRef(chooseLoc())
   
   // Replace with your actual API key
   const API_KEY: string = 'AIzaSyCo-qJ6-o4jR5EX-zocrl5B8yegOxmWRSI';
@@ -42,6 +53,25 @@ export default function StreetViewApp() {
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
+  function chooseLoc(lastLoc: Location | null = null){
+    let possible_locations = new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
+                              SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
+                              FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE,])
+
+    if (lastLoc){
+      possible_locations.delete(lastLoc)
+    }
+    
+    let location_array = Array.from(possible_locations)
+
+
+    const loc_index = Math.floor((Math.random() * location_array.length))
+    const location = location_array[loc_index]
+
+    return location
+  };
+  
+
   useEffect(() => {
     // Check if Google Maps is already loaded
     if (window.google && window.google.maps) {
@@ -50,7 +80,7 @@ export default function StreetViewApp() {
         panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
-            position: INITIAL_LOCATION,
+            position: CURRENT_LOCATION.current,
             pov: { 
               heading: INITIAL_HEADING, 
               pitch: INITIAL_PITCH 
@@ -82,7 +112,7 @@ export default function StreetViewApp() {
         panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
-            position: INITIAL_LOCATION,
+            position: CURRENT_LOCATION.current,
             pov: { 
               heading: INITIAL_HEADING, 
               pitch: INITIAL_PITCH 
@@ -201,7 +231,7 @@ export default function StreetViewApp() {
               // Calculate distance from actual location
               const difference = google.maps.geometry.spherical.computeDistanceBetween(
                 new google.maps.LatLng(guessedPosition.lat, guessedPosition.lng),
-                new google.maps.LatLng(INITIAL_LOCATION.lat, INITIAL_LOCATION.lng)
+                new google.maps.LatLng(CURRENT_LOCATION.current.lat, CURRENT_LOCATION.current.lng)
               );
               console.log('Distance from actual location:', difference, "meters.");
 
@@ -216,7 +246,7 @@ export default function StreetViewApp() {
                 lineRef.current = new google.maps.Polyline({
                   path: [
                     { lat: guessedPosition.lat, lng: guessedPosition.lng },
-                    { lat: INITIAL_LOCATION.lat, lng: INITIAL_LOCATION.lng }
+                    { lat: CURRENT_LOCATION.current.lat, lng: CURRENT_LOCATION.current.lng }
                   ],
                   geodesic: true,
                   strokeColor: '#ff0000',
@@ -227,7 +257,7 @@ export default function StreetViewApp() {
 
                 // Add marker on the actual location
                 actualLocationMarkerRef.current = new google.maps.marker.AdvancedMarkerElement({
-                  position: INITIAL_LOCATION,
+                  position: CURRENT_LOCATION.current,
                   map: mapInstanceRef.current,
                   title: 'Actual Location',
                   gmpDraggable: false,
@@ -269,7 +299,14 @@ export default function StreetViewApp() {
           <button
             onClick={() => {
               setShowResults(false);
-              }}
+              let newpos = chooseLoc(CURRENT_LOCATION.current)
+              CURRENT_LOCATION.current = newpos
+              panoRef.current?.setPosition(newpos);
+              hasGuessedRef.current = false;
+              setShowMap(false);
+              }
+            }
+            
             className="absolute top-4 right-4 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition"
           >
             <X size={20} />
