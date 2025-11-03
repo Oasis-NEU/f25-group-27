@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useState, useEffect, useRef } from 'react';
-import { Check, Map, X } from 'lucide-react';
+import { Check, Map, X, BarChart3 } from 'lucide-react';
 
 interface Location {
   lat: number;
@@ -294,6 +294,19 @@ export default function StreetViewApp() {
           </button>
         )}
 
+        {/* View Results Button (only after guessing) */}
+        { hasGuessedRef.current && (
+          <button 
+            onClick = {() => 
+              setShowResults(true)
+            }
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 -translate-y-4 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover: shadow-xl hover: bg-bluee-700 transition-all flex items-center gap-2 font-semibold z-50"
+            >
+              <BarChart3 size={20} />
+              View Results
+            </button>
+        )}
+
         {/* Map Container */}
         <div 
           ref={mapRef}
@@ -307,18 +320,7 @@ export default function StreetViewApp() {
                {/* Close Button */}
           <button
             onClick={() => {
-              setShowResults(false);
-              let newpos = chooseLoc(CURRENT_LOCATION.current)
-              CURRENT_LOCATION.current = newpos
-              panoRef.current?.setPosition(newpos);
-              hasGuessedRef.current = false;
-              setShowMap(false);
-              lineRef.current?.setVisible(false);
-              if (markerRef.current && actualLocationMarkerRef.current) {
-                markerRef.current.map = null;
-                actualLocationMarkerRef.current.map = null;
-              }
-              
+              setShowResults(false); 
               }
             }
             
@@ -362,7 +364,18 @@ export default function StreetViewApp() {
                 <button
                   onClick = {() => {
                     console.log("Play Again clicked");
-                    
+                    setShowResults(false);
+                    let newpos = chooseLoc(CURRENT_LOCATION.current)
+                    CURRENT_LOCATION.current = newpos
+                    panoRef.current?.setPosition(newpos);
+                    hasGuessedRef.current = false;
+                    setShowMap(false);
+                    lineRef.current?.setVisible(false);
+                    if (markerRef.current && actualLocationMarkerRef.current && mapInstanceRef.current) {
+                      markerRef.current.map = null;
+                      actualLocationMarkerRef.current.map = null;
+                      mapInstanceRef.current.setCenter(CAMPUS_CENTER);
+                    }
                   }}
                   className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
                   >
