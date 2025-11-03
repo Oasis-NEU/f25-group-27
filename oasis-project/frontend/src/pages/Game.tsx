@@ -50,6 +50,7 @@ export default function StreetViewApp() {
   const lineRef = useRef<google.maps.Polyline | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const actualLocationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const actualLocationPin = useRef<google.maps.marker.PinElement | null>(null);
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
@@ -171,6 +172,7 @@ export default function StreetViewApp() {
             gmpDraggable: false,
           });
         } else if (markerRef.current) {
+          markerRef.current.map = mapInstanceRef.current; // Ensure marker is on the map
           markerRef.current.position = clickedLocation;
         }
         }
@@ -263,6 +265,11 @@ export default function StreetViewApp() {
                   map: mapInstanceRef.current,
                   title: 'Actual Location',
                   gmpDraggable: false,
+                  content: new google.maps.marker.PinElement({
+                    background: 'limegreen',
+                    borderColor: 'limegreen',
+                    glyphColor: 'green',
+                  }),
                 });
               }
 
@@ -311,6 +318,7 @@ export default function StreetViewApp() {
                 markerRef.current.map = null;
                 actualLocationMarkerRef.current.map = null;
               }
+              
               }
             }
             
@@ -350,6 +358,17 @@ export default function StreetViewApp() {
                 </p>
               )}
             </div>
+              <div className="pt-4">
+                <button
+                  onClick = {() => {
+                    console.log("Play Again clicked");
+                    
+                  }}
+                  className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                  >
+                    Play Again
+                </button>
+              </div>
           </div>
         </div>
       )}
