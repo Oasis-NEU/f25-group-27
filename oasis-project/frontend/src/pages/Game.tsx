@@ -38,11 +38,11 @@ export default function StreetViewApp() {
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
-  const VISITED_LOCATIONS = useRef(new Array());
+  const VISITED_LOCATIONS = useRef([] as Location[]);
   const ALL_LOCATIONS = useRef(new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
                             SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
                             FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE, 
-                            RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD]));
+                            RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD, WEST_CORNER]));
   const CURRENT_LOCATION = useRef(chooseLoc());
   
 
@@ -65,17 +65,17 @@ export default function StreetViewApp() {
 
   function chooseLoc(){
     
-    let possible_locations = ALL_LOCATIONS.current
+    const possible_locations = ALL_LOCATIONS.current
 
     if(possible_locations == new Set(VISITED_LOCATIONS.current)){
-      VISITED_LOCATIONS.current = new Array()
+      VISITED_LOCATIONS.current = [] as Location[];
     }
 
     for(const loc of VISITED_LOCATIONS.current){
         possible_locations.delete(loc)
       }
     
-    let location_array = Array.from(possible_locations)
+    const location_array = Array.from(possible_locations)
 
 
     const loc_index = Math.floor((Math.random() * location_array.length))
