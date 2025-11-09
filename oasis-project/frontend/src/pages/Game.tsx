@@ -377,7 +377,7 @@ export default function StreetViewApp() {
                     console.log("Play Again clicked");
                     setShowResults(false);
                     VISITED_LOCATIONS.current.push(CURRENT_LOCATION.current)
-                    let newpos = chooseLoc()
+                    const newpos = chooseLoc()
                     CURRENT_LOCATION.current = newpos
                     panoRef.current?.setPosition(newpos);
                     hasGuessedRef.current = false;
