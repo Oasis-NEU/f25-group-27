@@ -236,8 +236,8 @@ export default function StreetViewApp() {
             if (markerRef.current && markerRef.current.position) {
               const position = markerRef.current.position as google.maps.LatLng;
               const guessedPosition = {
-                lat: position.lat,
-                lng: position.lng,
+                lat: position.lat(),
+                lng: position.lng(),
               };
 
               console.log('Confirmed Guess at:', guessedPosition);
