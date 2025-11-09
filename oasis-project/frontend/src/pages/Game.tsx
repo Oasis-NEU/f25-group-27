@@ -63,6 +63,8 @@ export default function StreetViewApp() {
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
+
+
   function setEquality(setA: Set<Location>, setB: Set<Location>){
     
     if(setA.size == setB.size){
@@ -247,6 +249,10 @@ export default function StreetViewApp() {
         { !hasGuessedRef.current && (
         <button
           onClick={() => {
+
+            if (!markerRef.current?.checkVisibility()) {
+              return;
+            }
 
             // Set guessed location to the current marker position
             if (markerRef.current && markerRef.current.position) {
