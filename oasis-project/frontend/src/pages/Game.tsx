@@ -35,7 +35,14 @@ export default function StreetViewApp() {
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
-  const CURRENT_LOCATION = useRef(chooseLoc())
+  const VISITED_LOCATIONS = useRef(new Array());
+  const ALL_LOCATIONS = useRef(new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
+                            SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
+                            FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE, 
+                            RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD]));
+  const CURRENT_LOCATION = useRef(chooseLoc());
+  
+
   
   // Replace with your actual API key
   const API_KEY: string = 'AIzaSyCo-qJ6-o4jR5EX-zocrl5B8yegOxmWRSI';
@@ -54,15 +61,17 @@ export default function StreetViewApp() {
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
-  function chooseLoc(lastLoc: Location | null = null){
-    let possible_locations = new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
-                              SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
-                              FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE, 
-                              RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD]);
+  function chooseLoc(){
+    
+    let possible_locations = ALL_LOCATIONS.current
 
-    if (lastLoc){
-      possible_locations.delete(lastLoc)
+    if(possible_locations == new Set(VISITED_LOCATIONS.current)){
+      VISITED_LOCATIONS.current = new Array()
     }
+
+    for(const loc of VISITED_LOCATIONS.current){
+        possible_locations.delete(loc)
+      }
     
     let location_array = Array.from(possible_locations)
 
@@ -365,7 +374,8 @@ export default function StreetViewApp() {
                   onClick = {() => {
                     console.log("Play Again clicked");
                     setShowResults(false);
-                    let newpos = chooseLoc(CURRENT_LOCATION.current)
+                    VISITED_LOCATIONS.current.push(CURRENT_LOCATION.current)
+                    let newpos = chooseLoc()
                     CURRENT_LOCATION.current = newpos
                     panoRef.current?.setPosition(newpos);
                     hasGuessedRef.current = false;
