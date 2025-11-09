@@ -38,7 +38,7 @@ export default function StreetViewApp() {
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
-  const VISITED_LOCATIONS = useRef([] as Location[]);
+  const VISITED_LOCATIONS = useRef(new Set<Location>());
   const ALL_LOCATIONS = useRef(new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
                             SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
                             FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE, 
@@ -63,12 +63,27 @@ export default function StreetViewApp() {
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
+  function setEquality(setA: Set<Location>, setB: Set<Location>){
+    
+    if(setA.size == setB.size){
+
+      for(const el of setA){
+        if(!setB.has(el)){
+          return false;
+        }
+      }
+
+      return true;
+    }
+    return false;
+  }
+
   function chooseLoc(){
     
-    const possible_locations = ALL_LOCATIONS.current
+    const possible_locations = new Set([...ALL_LOCATIONS.current])
 
-    if(possible_locations == new Set(VISITED_LOCATIONS.current)){
-      VISITED_LOCATIONS.current = [] as Location[];
+    if(setEquality(possible_locations, VISITED_LOCATIONS.current)){
+      VISITED_LOCATIONS.current = new Set<Location>()
     }
 
     for(const loc of VISITED_LOCATIONS.current){
@@ -236,8 +251,8 @@ export default function StreetViewApp() {
             if (markerRef.current && markerRef.current.position) {
               const position = markerRef.current.position as google.maps.LatLng;
               const guessedPosition = {
-                lat: position.lat(),
-                lng: position.lng(),
+                lat: position.lat,
+                lng: position.lng,
               };
 
               console.log('Confirmed Guess at:', guessedPosition);
@@ -376,7 +391,7 @@ export default function StreetViewApp() {
                   onClick = {() => {
                     console.log("Play Again clicked");
                     setShowResults(false);
-                    VISITED_LOCATIONS.current.push(CURRENT_LOCATION.current)
+                    VISITED_LOCATIONS.current.add(CURRENT_LOCATION.current)
                     const newpos = chooseLoc()
                     CURRENT_LOCATION.current = newpos
                     panoRef.current?.setPosition(newpos);
