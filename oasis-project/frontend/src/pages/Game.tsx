@@ -84,6 +84,7 @@ export default function StreetViewApp() {
 
     if(setEquality(possible_locations, VISITED_LOCATIONS.current)){
       VISITED_LOCATIONS.current = new Set<Location>()
+      VISITED_LOCATIONS.current.add(CURRENT_LOCATION.current)
     }
 
     for(const loc of VISITED_LOCATIONS.current){
