@@ -27,11 +27,14 @@ export default function StreetViewApp() {
   const WAR_MEMORIAL: Location = { lat: 42.3377552, lng: -71.089432 }; // War Memorial 
   const CENTENIAL: Location = { lat: 42.3370999, lng: -71.0905084 }; //Centennial Common
   const ISEC_INSIDE: Location = { lat: 42.3375038, lng: -71.086988 }; // Inside ISEC Building
+  
+  //NOT WORKING RIGHT NOW
   const RUGGLES_OUTSIDE: Location = { lat: 42.336523, lng: -71.0900415 }; // Outside Ruggles T Station
   const BURNSTEIN: Location = { lat: 42.3384075, lng: -71.0930882 }; //Burnstein Hall Courtyard
+  
   const CARTER_FIELD: Location = { lat: 42.3394581, lng: -71.0846094 }; // Carter Field
   const IV_COURTYARD: Location = { lat: 42.3351058, lng: -71.0892139 }; // International Village Courtyard
-  const INITIAL_LOCATION: Location = { lat: 42.3370736, lng: -71.0936173 }; //West Corner of Campus
+  const WEST_CORNER: Location = { lat: 42.3370736, lng: -71.0936173 }; //West Corner of Campus
   const INITIAL_HEADING: number = 165; // Direction the camera is facing (0-360)
   const INITIAL_PITCH: number = 0; // Vertical angle (-90 to 90)
   const INITIAL_ZOOM: number = 1; // Zoom level (0-4)
@@ -50,7 +53,6 @@ export default function StreetViewApp() {
   const lineRef = useRef<google.maps.Polyline | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const actualLocationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
-  const actualLocationPin = useRef<google.maps.marker.PinElement | null>(null);
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
 
@@ -58,7 +60,7 @@ export default function StreetViewApp() {
     let possible_locations = new Set([MARINO, CABOT, MUGAR, EV, STEAST, CATHOLIC_CENTER, MASS300,
                               SHERATON, MIDTOWN, CHRISTIAN_SCIENCE, CAMPUS_CENTER, KRETZMAN_QUAD,
                               FENWAY_PATH, RUGGLES_STATION, WAR_MEMORIAL, CENTENIAL, ISEC_INSIDE, 
-                              RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD]);
+                              RUGGLES_OUTSIDE, BURNSTEIN, CARTER_FIELD, IV_COURTYARD, WEST_CORNER]);
 
     if (lastLoc){
       possible_locations.delete(lastLoc)
