@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import trees from '../assets/neutrees.jpg'
 import { Play } from 'lucide-react';
-import { Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Home.css';
 
 const HomePage: React.FC = () => {

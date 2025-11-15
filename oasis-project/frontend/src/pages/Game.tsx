@@ -96,6 +96,7 @@ export default function StreetViewApp() {
     useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const hasGuessedRef = useRef<boolean>(false);
   const panoRef = useRef<google.maps.StreetViewPanorama>(null);
+  const currentGuessRef = useRef<Location>(null);
 
   function setEquality(setA: Set<Location>, setB: Set<Location>) {
     if (setA.size == setB.size) {
@@ -225,6 +226,8 @@ export default function StreetViewApp() {
               lng: e.latLng.lng(),
             };
 
+            currentGuessRef.current = clickedLocation;
+
             console.log("Map clicked at:", clickedLocation);
 
             //If marker doesn't exist, create it. Otherwise, move it.
@@ -290,21 +293,19 @@ export default function StreetViewApp() {
 
               // Set guessed location to the current marker position
               if (markerRef.current && markerRef.current.position) {
-                const position = markerRef.current
-                  .position as google.maps.LatLng;
-                const guessedPosition = {
-                  lat: position.lat,
-                  lng: position.lng,
-                };
+                if (currentGuessRef.current == null) {
+                  return
+                }
+                const position = currentGuessRef.current
 
-                console.log("Confirmed Guess at:", guessedPosition);
+                console.log("Confirmed Guess at:", position);
 
                 // Calculate distance from actual location
                 const difference =
                   google.maps.geometry.spherical.computeDistanceBetween(
                     new google.maps.LatLng(
-                      guessedPosition.lat,
-                      guessedPosition.lng
+                      position.lat,
+                      position.lng
                     ),
                     new google.maps.LatLng(
                       CURRENT_LOCATION.current.lat,
@@ -316,6 +317,7 @@ export default function StreetViewApp() {
                   difference,
                   "meters."
                 );
+              
 
                 // Calculate score based on distance
                 const calculatedScore = Math.round(
@@ -332,7 +334,7 @@ export default function StreetViewApp() {
                 if (mapInstanceRef.current) {
                   lineRef.current = new google.maps.Polyline({
                     path: [
-                      { lat: guessedPosition.lat, lng: guessedPosition.lng },
+                      { lat: position.lat, lng: position.lng },
                       {
                         lat: CURRENT_LOCATION.current.lat,
                         lng: CURRENT_LOCATION.current.lng,
@@ -385,7 +387,7 @@ export default function StreetViewApp() {
         {hasGuessedRef.current && (
           <button
             onClick={() => setShowResults(true)}
-            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 -translate-y-4 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover: shadow-xl hover: bg-bluee-700 transition-all flex items-center gap-2 font-semibold z-50"
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 -translate-y-4 bg-blue-600 text-white px-4 py-3 rounded-full hover: shadow-xl hover: bg-bluee-700 transition-all flex items-center gap-2 font-semibold z-50"
           >
             <BarChart3 size={20} />
             View Results
