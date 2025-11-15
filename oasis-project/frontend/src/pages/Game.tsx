@@ -464,6 +464,7 @@ export default function StreetViewApp() {
                     markerRef.current.map = null;
                     actualLocationMarkerRef.current.map = null;
                     mapInstanceRef.current.setCenter(CAMPUS_CENTER);
+                    mapInstanceRef.current.setZoom(16);
                   }
                 }}
                 className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
