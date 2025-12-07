@@ -34,7 +34,7 @@ export default function StreetViewApp() {
   }; // Approximate Center of Campus
   const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
   const FENWAY_PATH: Location = { lat: 42.3409852, lng: -71.0914785 }; // Along the path to fenway north of Stwest
-  const RUGGLES_STATION: Location = { lat: 42.3361246, lng: 71.0887778 }; // Ruggles T Station
+  const RUGGLES_STATION: Location = { lat: 42.3361246, lng: -71.0887778 }; // Ruggles T Station
   const WAR_MEMORIAL: Location = { lat: 42.3377552, lng: -71.089432 }; // War Memorial
   const CENTENIAL: Location = { lat: 42.3370999, lng: -71.0905084 }; //Centennial Common
   const ISEC_INSIDE: Location = { lat: 42.3375038, lng: -71.086988 }; // Inside ISEC Building
