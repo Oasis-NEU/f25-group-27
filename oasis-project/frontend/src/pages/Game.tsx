@@ -15,26 +15,26 @@ declare global {
 
 export default function StreetViewApp() {
   // LOCATIONS
-  const MARINO: Location = { lat: 42.3398567, lng: -71.0907273 }; // Approximate Center of Campus
-  const CABOT: Location = { lat: 42.3397469, lng: -71.089287 }; // Approximate Center of Campus
-  const MUGAR: Location = { lat: 42.3394737, lng: -71.086873 }; // Approximate Center of Campus
-  const EV: Location = { lat: 42.3402671, lng: -71.0868493 }; // Approximate Center of Campus
-  const STEAST: Location = { lat: 42.3409249, lng: -71.0898761 }; // Approximate Center of Campus
-  const CATHOLIC_CENTER: Location = { lat: 42.3417765, lng: -71.0876946 }; // Approximate Center of Campus
-  const MASS300: Location = { lat: 42.34344746989925, lng: -71.08563281045348 }; // Approximate Center of Campus
-  const SHERATON: Location = { lat: 42.34591594539982, lng: -71.0835674735219 }; // Approximate Center of Campus
-  const MIDTOWN: Location = { lat: 42.34405670960164, lng: -71.08353192101417 }; // Approximate Center of Campus
+  const MARINO: Location = { lat: 42.3398567, lng: -71.0907273 }; // Marino Rec Center
+  const CABOT: Location = { lat: 42.3397469, lng: -71.089287 }; // Cabot Physical EDU Center
+  const MUGAR: Location = { lat: 42.3394737, lng: -71.086873 }; // Mugar Life Sciences Building
+  const EV: Location = { lat: 42.3402671, lng: -71.0868493 }; // East Village
+  const STEAST: Location = { lat: 42.3409249, lng: -71.0898761 }; // Stetson East
+  const CATHOLIC_CENTER: Location = { lat: 42.3417765, lng: -71.0876946 }; // Catholic Center @ NEU
+  const MASS300: Location = { lat: 42.34344746989925, lng: -71.08563281045348 }; // 300 Mass Ave
+  const SHERATON: Location = { lat: 42.34591594539982, lng: -71.0835674735219 }; // Everyone's Second Favorite
+  const MIDTOWN: Location = { lat: 42.34405670960164, lng: -71.08353192101417 }; // Everyone's Favorite
   const CHRISTIAN_SCIENCE: Location = {
     lat: 42.34481566080893,
     lng: -71.08394962188773,
-  }; // Approximate Center of Campus
+  }; // Christian Science Center
   const CAMPUS_CENTER: Location = {
     lat: 42.339015298689084,
     lng: -71.08872168679216,
   }; // Approximate Center of Campus
   const KRETZMAN_QUAD: Location = { lat: 42.3404458, lng: -71.088525 }; // Kretzman Quad
   const FENWAY_PATH: Location = { lat: 42.3409852, lng: -71.0914785 }; // Along the path to fenway north of Stwest
-  const RUGGLES_STATION: Location = { lat: 42.3361246, lng: 71.0887778 }; // Ruggles T Station
+  const RUGGLES_STATION: Location = { lat: 42.3361246, lng: -71.0887778 }; // Ruggles T Station
   const WAR_MEMORIAL: Location = { lat: 42.3377552, lng: -71.089432 }; // War Memorial
   const CENTENIAL: Location = { lat: 42.3370999, lng: -71.0905084 }; //Centennial Common
   const ISEC_INSIDE: Location = { lat: 42.3375038, lng: -71.086988 }; // Inside ISEC Building
@@ -134,13 +134,10 @@ export default function StreetViewApp() {
   useEffect(() => {
     if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
       console.log("Script already exists, skipping");
-      return;
-    }
-
-    // Check if Google Maps is already loaded
-    if (window.google && window.google.maps) {
-      console.log("Google Maps already loaded");
+      window.initMap = () => {
+      // Initialize Street View panorama
       if (streetViewRef.current) {
+        
         panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
@@ -151,24 +148,28 @@ export default function StreetViewApp() {
             },
             zoom: INITIAL_ZOOM,
             addressControl: false,
-            fullscreenControl: true,
+            fullscreenControl: false,
             motionTracking: true,
             motionTrackingControl: true,
-            clickToGo: false,
             linksControl: false,
+            clickToGo: false,
             showRoadLabels: false,
           }
         );
       }
-      return;
-    }
+    };
+    window.initMap()
+    return;
+  }
 
     // Load Google Maps API
     console.log("Loading Google Maps API...");
 
     window.initMap = () => {
+    
       // Initialize Street View panorama
       if (streetViewRef.current) {
+        
         panoRef.current = new window.google.maps.StreetViewPanorama(
           streetViewRef.current,
           {
